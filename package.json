@@ -1,0 +1,20 @@
+{
+  "name": "express-rho-contracts",
+  "version": "0.0.1",
+  "description": "Express.js plugin for checking request and response with rho-contracts",
+  "private": true,
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:bodylabs/express-rho-contracts.git"
+  },
+  "engines": {
+    "node": "0.12.0",
+    "npm": "3.1.x"
+  },
+  "dependencies": {
+    "rho-contracts": "git+https://bodylabs-deploy:ebdd9351c3f6@github.com/bodylabs/rho-contracts.js.git#ebdd935"
+  },
+  "devDependencies": {}
+}
