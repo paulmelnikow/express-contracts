@@ -14,7 +14,8 @@
     "npm": "3.1.x"
   },
   "dependencies": {
-    "rho-contracts": "git+https://bodylabs-deploy:ebdd9351c3f6@github.com/bodylabs/rho-contracts.js.git#ebdd935"
+    "rho-contracts": "git+https://bodylabs-deploy:ebdd9351c3f6@github.com/bodylabs/rho-contracts.js.git#ebdd935",
+    "underscore": "~1.8.3"
   },
   "devDependencies": {}
 }
