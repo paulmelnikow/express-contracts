@@ -1,4 +1,5 @@
-var _ = require('underscore');
+var _ = require('underscore'),
+    c = require('rho-contracts');
 
 var httpStatusCodeContract = c.and(
     c.integer,
@@ -8,7 +9,7 @@ var httpStatusCodeContract = c.and(
 var httpErrorContract = c.object({
     error: c.value(true),
     message: c.string,
-    httpStatus: cc.httpStatusCode,
+    httpStatus: httpStatusCodeContract,
 }).strict().rename('httpError');
 
 var HttpError = function (message, httpStatus) {
