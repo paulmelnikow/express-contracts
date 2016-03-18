@@ -4,7 +4,8 @@ var middleware = require('./middleware'),
     express = require('express'),
     bodyParser = require('body-parser'),
     request = require('supertest'),
-    should = require('should');
+    should = require('should'),
+    sinon = require('sinon');
 
 describe('Tests for middleware', function () {
 
@@ -25,11 +26,17 @@ describe('Tests for middleware', function () {
         appLogic(req, res, next);
     };
 
+    // mock context.logger
+    var context = {};
+    beforeEach(function () {
+        context.logger = { error: sinon.spy() };
+    });
+
     app.use(
         bodyParser.json(), // populates req.body
         middleware.endpointContract(requestContract, responseContract),
         appLogicLazy,
-        middleware.handleHttpError
+        middleware.handleHttpError(context)
     );
 
     it('should return expected response for good request and correct application logic', function (done) {
@@ -101,6 +108,9 @@ describe('Tests for middleware', function () {
             res.body.httpStatus.should.equal(500);
             res.body.error.should.equal(true);
             res.body.message.should.equal('Internal Server Error');
+            context.logger.error.args[0][0].message.should.equal(
+                'Some internal details that should not be surfaced from the app'
+            );
             done();
         });
     });
@@ -120,6 +130,7 @@ describe('Tests for middleware', function () {
             res.body.httpStatus.should.equal(500);
             res.body.error.should.equal(true);
             res.body.message.should.equal('Internal Server Error');
+            context.logger.error.args[0][0].name.should.equal('ContractError');
             done();
         });
     });
