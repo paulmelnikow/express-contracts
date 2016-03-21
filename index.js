@@ -1,7 +1,5 @@
 var middleware = require('./src/middleware'),
-    errors = require('./src/http-error'),
+    errors = require('./src/validation-error'),
     _ = require('underscore');
 
-module.exports = {};
-_(module.exports).extend(errors);
-_(module.exports).extend(middleware);
+module.exports = _({}).extend(errors, middleware);
