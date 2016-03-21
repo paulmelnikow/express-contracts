@@ -33,13 +33,13 @@ var exampleErrorHandlingMiddleware = function (err, req, res, next) {
 
 app.use(
    require('body-parser').json(), // populates req.body
-   erc.endpointContract(requestContract, responseContract),
+   erc.enforceContracts(requestContract, responseContract),
    exampleApplicationMiddleware,
    exampleErrorHandlingMiddleware
 );
 ```
 
-Note the middleware `endpointContract(requestContract, responseContract)`
+Note the middleware `enforceContracts(requestContract, responseContract)`
 distinguishes between `ValidationError` (for failures of `requestContract`) and
 `ContractError` (for failures of `responseContract`, taken directly from
 `rho-contracts`), which callers will likely wish to handle differently.

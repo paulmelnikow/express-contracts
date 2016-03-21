@@ -11,7 +11,7 @@ var errors = require('./validation-error');
 // TODO: anything about query string?
 // TODO: anything about default values for optional fields?
 //
-var endpointContract = function (requestContract, responseContract) {
+var enforceContracts = function (requestContract, responseContract) {
     return function (req, res, next) {
         // patch first, because that should never fail, whereas input
         // validation could, in which case you'd prefer to have patched already
@@ -40,4 +40,4 @@ var validateRequest = function (req, requestContract, next) {
     }
 };
 
-module.exports.endpointContract = endpointContract;
+module.exports.enforceContracts = enforceContracts;

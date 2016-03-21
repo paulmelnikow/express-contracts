@@ -5,8 +5,8 @@ var cc = {};
 
 cc.middleware = c.any.rename('middleware');
 
-cc.endpointContract = c.fun({ requestContract: c.contract }, { responseContract: c.contract })
+cc.enforceContracts = c.fun({ requestContract: c.contract }, { responseContract: c.contract })
     .returns(cc.middleware)
-    .wrap(impl.endpointContract);
+    .wrap(impl.enforceContracts);
 
-module.exports.endpointContract = cc.endpointContract;
+module.exports.enforceContracts = cc.enforceContracts;
