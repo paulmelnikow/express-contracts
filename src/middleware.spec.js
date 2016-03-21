@@ -11,8 +11,10 @@ describe('Tests for middleware', function () {
     var app = express();
 
     var requestContract = c.object({
-        foo: c.value('bar'),
-    }).strict().rename('request');
+            body: c.object({
+                foo: c.value('bar'),
+            }).strict(),
+        }).rename('request');
 
     var responseContract = c.object({
         baz: c.value('barbar'),

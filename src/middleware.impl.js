@@ -8,7 +8,6 @@ var errors = require('./validation-error');
 // checkedJson that checks a payload against `responseContract` before sending
 // (passing a `ContractError` as-is to `next` on failure).
 //
-// TODO: anything about query string?
 // TODO: anything about default values for optional fields?
 //
 var enforceContracts = function (requestContract, responseContract) {
@@ -34,7 +33,7 @@ var extendWithCheckedJson = function (res, responseContract, next) {
 
 var validateRequest = function (req, requestContract, next) {
     try {
-        requestContract.check(req.body);
+        requestContract.check(req);
     } catch (e) {
         return next(new errors.ValidationError(e.message));
     }

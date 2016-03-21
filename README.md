@@ -8,8 +8,10 @@ var c = require('rho-contracts'),
     erc = require('express-rho-contracts');
 
 var requestContract = c.object({
-    foo: c.value('bar'),
-}).strict().rename('request');
+    body: c.object({
+        foo: c.value('bar'),
+    }).strict(),
+}).rename('request');
 
 var responseContract = c.object({
     baz: c.value('barbar'),
@@ -47,3 +49,8 @@ distinguishes between `ValidationError` (for failures of `requestContract`) and
 Furthermore, note that the middleware works by extending `res` with a method
 `checkedJson` which checks `responseContract` before calling `res.json`, thus
 it is easy to "jump out" of the contract e.g. to send an error.
+
+Finally, there is an asymmetry between the `requestContract`, which is run over
+the whole request, and the `responseContract`, which is only run over the
+payload which eventually becomes the `res.body`. This is so that we can
+additionally enforce contracts on the query string.
