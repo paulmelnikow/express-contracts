@@ -1,11 +1,10 @@
 var middleware = require('./middleware'),
-    errors = require('./http-error'),
+    errors = require('./validation-error'),
     c = require('rho-contracts'),
     express = require('express'),
     bodyParser = require('body-parser'),
     request = require('supertest'),
-    should = require('should'),
-    sinon = require('sinon');
+    should = require('should');
 
 describe('Tests for middleware', function () {
 
@@ -26,22 +25,29 @@ describe('Tests for middleware', function () {
         appLogic(req, res, next);
     };
 
-    // mock context.logger
-    var context = {};
-    beforeEach(function () {
-        context.logger = { error: sinon.spy() };
-    });
+    // Simple error handler to test that different types are propagated
+    var exampleHandleError = function (err, req, res, next) {
+        if (err) {
+            if (err instanceof errors.ValidationError) {
+                res.status(400).json({ error: err.message });
+            } else if (err instanceof c.ContractError) {
+                res.status(500).json({ error: 'Internal Contract Violation' });
+            } else {
+                res.status(500).json({ error: 'Internal Server Error' });
+            }
+        }
+    };
 
     app.use(
         bodyParser.json(), // populates req.body
         middleware.endpointContract(requestContract, responseContract),
         appLogicLazy,
-        middleware.handleHttpError(context)
+        exampleHandleError
     );
 
     it('should return expected response for good request and correct application logic', function (done) {
         appLogic = function (req, res, next) {
-            res.status(200).json({ baz: req.body.foo + req.body.foo });
+            res.status(200).checkedJson({ baz: req.body.foo + req.body.foo });
         };
 
         request(app)
@@ -55,9 +61,9 @@ describe('Tests for middleware', function () {
         });
     });
 
-    it('should return 400 and helpful message for bad request', function (done) {
+    it('should detect bad request (separate from internal contract errors)', function (done) {
         appLogic = function (req, res, next) {
-            res.status(200).json({ baz: req.body.foo + req.body.foo });
+            res.status(200).checkedJson({ baz: req.body.foo + req.body.foo });
         };
 
         request(app)
@@ -66,36 +72,14 @@ describe('Tests for middleware', function () {
         .expect(400)
         .end(function (err, res) {
             should(err).equal(null);
-            errors.httpErrorContract.check(res.body);
-            res.body.httpStatus.should.equal(400);
-            res.body.error.should.equal(true);
-            res.body.message.should.match(/^Field `foo` required/);
+            res.body.error.should.match(/^Field `foo` required/);
             done();
         });
     });
 
-    it('should return custom status and message for other HttpError', function (done) {
+    it('should detect internal contract errors (separate from bad requests)', function (done) {
         appLogic = function (req, res, next) {
-            next(new errors.HttpError('Forbidden', 403));
-        };
-
-        request(app)
-        .post('/')
-        .send({ foo: 'bar' })
-        .expect(403)
-        .end(function (err, res) {
-            should(err).equal(null);
-            errors.httpErrorContract.check(res.body);
-            res.body.httpStatus.should.equal(403);
-            res.body.error.should.equal(true);
-            res.body.message.should.equal('Forbidden');
-            done();
-        });
-    });
-
-    it('should return 500 and unhelpful message for errors other than HttpError', function (done) {
-        appLogic = function (req, res, next) {
-            next(new Error('Some internal details that should not be surfaced from the app'));
+            res.status(200).checkedJson({ bad: 'format' });
         };
 
         request(app)
@@ -104,33 +88,7 @@ describe('Tests for middleware', function () {
         .expect(500)
         .end(function (err, res) {
             should(err).equal(null);
-            errors.httpErrorContract.check(res.body);
-            res.body.httpStatus.should.equal(500);
-            res.body.error.should.equal(true);
-            res.body.message.should.equal('Internal Server Error');
-            context.logger.error.args[0][0].message.should.equal(
-                'Some internal details that should not be surfaced from the app'
-            );
-            done();
-        });
-    });
-
-    it('should return 500 and unhelpful message for internal contract violation', function (done) {
-        appLogic = function (req, res, next) {
-            res.status(200).json({ bad: 'format' });
-        };
-
-        request(app)
-        .post('/')
-        .send({ foo: 'bar' })
-        .expect(500)
-        .end(function (err, res) {
-            should(err).equal(null);
-            errors.httpErrorContract.check(res.body);
-            res.body.httpStatus.should.equal(500);
-            res.body.error.should.equal(true);
-            res.body.message.should.equal('Internal Server Error');
-            context.logger.error.args[0][0].name.should.equal('ContractError');
+            res.body.error.should.equal('Internal Contract Violation');
             done();
         });
     });
