@@ -5,15 +5,13 @@ var errors = require('./validation-error');
 //
 // That is, check the `req` against `requestContract` (passing
 // `ValidationError` to `next` on failure), and extend `res` with a method
-// checkedJson that checks a payload against `responseContract` before sending
-// (passing a `ContractError` as-is to `next` on failure).
+// `checkedJson` that checks a payload against `responseContract` before
+// sending (passing a `ContractError` as-is to `next` on failure).
 //
 // TODO: anything about default values for optional fields?
 //
 var enforceContracts = function (requestContract, responseContract) {
     return function (req, res, next) {
-        // patch first, because that should never fail, whereas input
-        // validation could, in which case you'd prefer to have patched already
         validateRequest(req, requestContract, next);
         extendWithCheckedJson(res, responseContract, next);
         next();
