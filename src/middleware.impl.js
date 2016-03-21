@@ -10,7 +10,7 @@ var errors = require('./validation-error');
 //
 // TODO: anything about default values for optional fields?
 //
-var enforceContracts = function (requestContract, responseContract) {
+var useContracts = function (requestContract, responseContract) {
     return function (req, res, next) {
         validateRequest(req, requestContract, next);
         extendWithCheckedJson(res, responseContract, next);
@@ -37,4 +37,4 @@ var validateRequest = function (req, requestContract, next) {
     }
 };
 
-module.exports.enforceContracts = enforceContracts;
+module.exports.useContracts = useContracts;

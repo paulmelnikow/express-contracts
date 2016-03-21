@@ -42,7 +42,7 @@ describe('Tests for middleware', function () {
 
     app.use(
         bodyParser.json(), // populates req.body
-        middleware.enforceContracts(requestContract, responseContract),
+        middleware.useContracts(requestContract, responseContract),
         appLogicLazy,
         exampleHandleError
     );
