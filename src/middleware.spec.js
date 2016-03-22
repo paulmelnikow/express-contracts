@@ -59,7 +59,7 @@ describe('Tests for middleware', function () {
         .expect(200)
         .end(function (err, res) {
             should(err).equal(null);
-            cc.responseBody.check(res.body);
+            cc.responseBody.check(res.body); // sanity check
             done();
         });
     });
