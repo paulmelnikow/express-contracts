@@ -1,6 +1,6 @@
 {
   "name": "express-rho-contracts",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Express.js plugin for checking request and response with rho-contracts",
   "private": true,
   "main": "index.js",

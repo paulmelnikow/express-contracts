@@ -5,8 +5,7 @@ var cc = {};
 
 cc.middleware = c.any.rename('middleware');
 
-cc.useContracts = c.fun({ requestContract: c.contract }, { responseContract: c.contract })
-    .returns(cc.middleware)
-    .wrap(impl.useContracts);
+cc.useContracts = c.fun({ requestContract: c.contract }, { responseBodyContract: c.contract })
+    .returns(cc.middleware);
 
-module.exports.useContracts = cc.useContracts;
+module.exports.useContracts = cc.useContracts.wrap(impl.useContracts);

@@ -1,8 +1,7 @@
 var middleware = require('./middleware'),
-    errors = require('./validation-error'),
+    errors = require('./errors'),
     c = require('rho-contracts'),
     express = require('express'),
-    bodyParser = require('body-parser'),
     request = require('supertest'),
     should = require('should');
 
@@ -10,15 +9,17 @@ describe('Tests for middleware', function () {
 
     var app = express();
 
-    var requestContract = c.object({
+    var cc = {};
+
+    cc.request = c.object({
             body: c.object({
                 foo: c.value('bar'),
             }).strict(),
         }).rename('request');
 
-    var responseContract = c.object({
+    cc.responseBody = c.object({
         baz: c.value('barbar'),
-    }).strict().rename('response');
+    }).strict().rename('responseBody');
 
     // Each test should set appLogic (lexical variable) to customize
     // appLogicLazy middleware.
@@ -41,8 +42,8 @@ describe('Tests for middleware', function () {
     };
 
     app.use(
-        bodyParser.json(), // populates req.body
-        middleware.useContracts(requestContract, responseContract),
+        require('body-parser').json(), // populates req.body
+        middleware.useContracts(cc.request, cc.responseBody),
         appLogicLazy,
         exampleHandleError
     );
@@ -58,7 +59,7 @@ describe('Tests for middleware', function () {
         .expect(200)
         .end(function (err, res) {
             should(err).equal(null);
-            responseContract.check(res.body);
+            cc.responseBody.check(res.body);
             done();
         });
     });
@@ -91,6 +92,23 @@ describe('Tests for middleware', function () {
         .end(function (err, res) {
             should(err).equal(null);
             res.body.error.should.equal('Internal Contract Violation');
+            done();
+        });
+    });
+
+    it('should skip contract check with res.json', function (done) {
+        // Also implicitly tested via exampleHandleError middleware
+        appLogic = function (req, res, next) {
+            res.status(403).json({ error: 'Forbidden' });
+        };
+
+        request(app)
+        .post('/')
+        .send({ foo: 'bar' })
+        .expect(403)
+        .end(function (err, res) {
+            should(err).equal(null);
+            res.body.error.should.equal('Forbidden');
             done();
         });
     });
