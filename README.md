@@ -7,15 +7,17 @@ Example usage (adapted from `middleware.spec.js`):
 var c = require('rho-contracts'),
     erc = require('express-rho-contracts');
 
-var requestContract = c.object({
-    body: c.object({
-        foo: c.value('bar'),
-    }).strict(),
-}).rename('request');
+var cc = {};
 
-var responseContract = c.object({
+cc.request = c.object({
+        body: c.object({
+            foo: c.value('bar'),
+        }).strict(),
+    }).rename('request');
+
+cc.responseBody = c.object({
     baz: c.value('barbar'),
-}).strict().rename('response');
+}).strict().rename('responseBody');
 
 var exampleApplicationMiddleware = function (req, res, next) {
     res.status(200).checkedJson({ baz: req.body.foo + req.body.foo });
@@ -35,22 +37,22 @@ var exampleErrorHandlingMiddleware = function (err, req, res, next) {
 
 app.use(
    require('body-parser').json(), // populates req.body
-   erc.useContracts(requestContract, responseContract),
+   erc.useContracts(cc.request, cc.responseBody),
    exampleApplicationMiddleware,
    exampleErrorHandlingMiddleware
 );
 ```
 
-Note the middleware `useContracts(requestContract, responseContract)`
+Note the middleware `useContracts(requestContract, responseBodyContract)`
 distinguishes between `ValidationError` (for failures of `requestContract`) and
-`ContractError` (for failures of `responseContract`, taken directly from
-`rho-contracts`), which callers will likely wish to handle differently.
+`ContractError` (for failures of `responseBodyContract`), which callers will
+likely wish to handle differently.
 
 Furthermore, note that the middleware works by extending `res` with a method
-`checkedJson` which checks `responseContract` before calling `res.json`, thus
-it is easy to "jump out" of the contract e.g. to send an error.
+`checkedJson` which checks `responseBodyContract` before calling `res.json`,
+thus it is easy to "jump out" of the contract e.g. to send an error.
 
 Finally, there is an asymmetry between the `requestContract`, which is run over
-the whole request, and the `responseContract`, which is only run over the
-payload which eventually becomes the `res.body`. This is so that we can
-additionally enforce contracts on the query string.
+the whole request, and the `responseBodyContract`, which is only run over the
+payload which eventually becomes the `res.body`. The motivation for checking
+the whole request is to have the ability to check query strings.
