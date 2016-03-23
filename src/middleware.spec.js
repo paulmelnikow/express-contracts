@@ -21,6 +21,10 @@ describe('Tests for middleware', function () {
         baz: c.value('barbar'),
     }).strict().rename('responseBody');
 
+    cc.errorBody = c.object({
+        error: c.string,
+    }).strict().rename('errorBody');
+
     // Each test should set appLogic (lexical variable) to customize
     // appLogicLazy middleware.
     var appLogic;
@@ -32,18 +36,18 @@ describe('Tests for middleware', function () {
     var exampleHandleError = function (err, req, res, next) {
         if (err) {
             if (err instanceof errors.ValidationError) {
-                res.status(400).json({ error: err.message });
+                res.status(400).checkedJson({ error: err.message });
             } else if (err instanceof c.ContractError) {
-                res.status(500).json({ error: 'Internal Contract Violation' });
+                res.status(500).checkedJson({ error: 'Internal Contract Violation' });
             } else {
-                res.status(500).json({ error: 'Internal Server Error' });
+                res.status(500).checkedJson({ error: 'Internal Server Error' });
             }
         }
     };
 
     app.use(
         require('body-parser').json(), // populates req.body
-        middleware.useContracts(cc.request, cc.responseBody),
+        middleware.useContracts(cc.request, c.or(cc.responseBody, cc.errorBody)),
         appLogicLazy,
         exampleHandleError
     );
@@ -75,6 +79,7 @@ describe('Tests for middleware', function () {
         .expect(400)
         .end(function (err, res) {
             should(err).equal(null);
+            cc.errorBody.check(res.body); // sanity check
             res.body.error.should.match(/^Field `foo` required/);
             done();
         });
@@ -91,15 +96,15 @@ describe('Tests for middleware', function () {
         .expect(500)
         .end(function (err, res) {
             should(err).equal(null);
+            cc.errorBody.check(res.body); // sanity check
             res.body.error.should.equal('Internal Contract Violation');
             done();
         });
     });
 
     it('should skip contract check with res.json', function (done) {
-        // Also implicitly tested via exampleHandleError middleware
         appLogic = function (req, res, next) {
-            res.status(403).json({ error: 'Forbidden' });
+            res.status(403).json({ strangelyFormattedError: 'Forbidden' });
         };
 
         request(app)
@@ -108,7 +113,7 @@ describe('Tests for middleware', function () {
         .expect(403)
         .end(function (err, res) {
             should(err).equal(null);
-            res.body.error.should.equal('Forbidden');
+            res.body.strangelyFormattedError.should.equal('Forbidden');
             done();
         });
     });

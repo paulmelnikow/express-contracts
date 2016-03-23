@@ -12,8 +12,9 @@ var errors = require('./errors');
 //
 var useContracts = function (requestContract, responseBodyContract) {
     return function (req, res, next) {
-        validateRequest(req, requestContract, next);
+        // Error handler may want to use checkedJson even in case of ValidationError, so extend first.
         extendWithCheckedJson(res, responseBodyContract, next);
+        validateRequest(req, requestContract, next);
         next();
     };
 };
