@@ -80,7 +80,8 @@ describe('Tests for middleware', function () {
         .end(function (err, res) {
             should(err).equal(null);
             cc.errorBody.check(res.body); // sanity check
-            res.body.error.should.match(/^Field `foo` required/);
+            res.body.error.should.match(/^Validation error in request field `body`:\n/);
+            res.body.error.should.match(/Field `foo` required/);
             done();
         });
     });
