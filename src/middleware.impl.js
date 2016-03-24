@@ -40,7 +40,6 @@ var validateRequest = function (req, requestContract, next) {
                 reqField = req[key];
             fieldContract.check(reqField);
         }
-        requestContract.check(req);
     } catch (e) {
         var prefix = 'Validation error in request field `' + key + '`:\n';
         return next(new errors.ValidationError(prefix + e.message));

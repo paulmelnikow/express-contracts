@@ -12,10 +12,10 @@ describe('Tests for middleware', function () {
     var cc = {};
 
     cc.request = c.object({
-            body: c.object({
-                foo: c.value('bar'),
-            }).strict(),
-        }).rename('request');
+        body: c.object({
+            foo: c.value('bar'),
+        }).strict(),
+    }).rename('request');
 
     cc.responseBody = c.object({
         baz: c.value('barbar'),
@@ -82,6 +82,9 @@ describe('Tests for middleware', function () {
             cc.errorBody.check(res.body); // sanity check
             res.body.error.should.match(/^Validation error in request field `body`:\n/);
             res.body.error.should.match(/Field `foo` required/);
+            // Should not dump entire `req` into error message
+            res.body.error.length.should.be.lessThan(1000);
+            res.body.error.should.not.match(/_maxListeners/); // express populates such keys in `req`
             done();
         });
     });
