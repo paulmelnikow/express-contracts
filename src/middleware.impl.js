@@ -12,8 +12,9 @@ var errors = require('./errors');
 //
 var useContracts = function (requestContract, responseBodyContract) {
     return function (req, res, next) {
-        validateRequest(req, requestContract, next);
+        // Error handler may want to use checkedJson even in case of ValidationError, so extend first.
         extendWithCheckedJson(res, responseBodyContract, next);
+        validateRequest(req, requestContract, next);
         next();
     };
 };
@@ -30,10 +31,21 @@ var extendWithCheckedJson = function (res, responseBodyContract, next) {
 };
 
 var validateRequest = function (req, requestContract, next) {
+    // Check each field (body, query, etc) individually so that we don't
+    // dump the *entire* express req object into the error message.
+    var relevantKeyDescriptions = { body: 'request body', query: 'query string' };
+    var key;
     try {
-        requestContract.check(req);
+        for (key in relevantKeyDescriptions) {
+            if (key in requestContract.fieldContracts) {
+                var fieldContract = requestContract.fieldContracts[key],
+                    reqField = req[key];
+                fieldContract.check(reqField);
+            }
+        }
     } catch (e) {
-        return next(new errors.ValidationError(e.message));
+        var prefix = 'Validation error in ' + relevantKeyDescriptions[key] + ':\n';
+        return next(new errors.ValidationError(prefix + e.message));
     }
 };
 
