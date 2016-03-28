@@ -31,17 +31,20 @@ var extendWithCheckedJson = function (res, responseBodyContract, next) {
 };
 
 var validateRequest = function (req, requestContract, next) {
+    // Check each field (body, query, etc) individually so that we don't
+    // dump the *entire* express req object into the error message.
+    var relevantKeyDescriptions = { body: 'request body', query: 'query string' };
     var key;
     try {
-        // Check each field (body, query, etc) individually so that we don't
-        // dump the *entire* express req object into the error message.
-        for (key in requestContract.fieldContracts) {
-            var fieldContract = requestContract.fieldContracts[key],
-                reqField = req[key];
-            fieldContract.check(reqField);
+        for (key in relevantKeyDescriptions) {
+            if (key in requestContract.fieldContracts) {
+                var fieldContract = requestContract.fieldContracts[key],
+                    reqField = req[key];
+                fieldContract.check(reqField);
+            }
         }
     } catch (e) {
-        var prefix = 'Validation error in request field `' + key + '`:\n';
+        var prefix = 'Validation error in ' + relevantKeyDescriptions[key] + ':\n';
         return next(new errors.ValidationError(prefix + e.message));
     }
 };

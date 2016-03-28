@@ -68,7 +68,7 @@ describe('Tests for middleware', function () {
         });
     });
 
-    it('should detect bad request (separate from internal contract errors)', function (done) {
+    it('should detect bad request body (separate from internal contract errors)', function (done) {
         appLogic = function (req, res, next) {
             res.status(200).checkedJson({ baz: req.body.foo + req.body.foo });
         };
@@ -80,11 +80,9 @@ describe('Tests for middleware', function () {
         .end(function (err, res) {
             should(err).equal(null);
             cc.errorBody.check(res.body); // sanity check
-            res.body.error.should.match(/^Validation error in request field `body`:\n/);
-            res.body.error.should.match(/Field `foo` required/);
             // Should not dump entire `req` into error message
-            res.body.error.length.should.be.lessThan(1000);
-            res.body.error.should.not.match(/_maxListeners/); // express populates such keys in `req`
+            res.body.error.should.equal('Validation error in request body:\nField `foo` required, got {}\n');
+
             done();
         });
     });
