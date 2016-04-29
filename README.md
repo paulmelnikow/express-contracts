@@ -1,11 +1,15 @@
-# express-rho-contracts
+express-contracts
+=================
+
 Express.js plugin for checking request and response with rho-contracts
 
-Example usage (adapted from `middleware.spec.js`):
+
+Usage
+-----
 
 ```js
 var c = require('rho-contracts'),
-    erc = require('express-rho-contracts');
+    ec = require('express-contracts');
 
 var cc = {};
 
@@ -25,7 +29,7 @@ var exampleApplicationMiddleware = function (req, res, next) {
 
 var exampleErrorHandlingMiddleware = function (err, req, res, next) {
     if (err) {
-        if (err instanceof erc.ValidationError) {
+        if (err instanceof ec.ValidationError) {
             res.status(400).json({ error: err.message });
         } else if (err instanceof c.ContractError) {
             res.status(500).json({ error: 'Internal Contract Violation' });
@@ -37,7 +41,7 @@ var exampleErrorHandlingMiddleware = function (err, req, res, next) {
 
 app.use(
    require('body-parser').json(), // populates req.body
-   erc.useContracts(cc.request, cc.responseBody),
+   ec.useContracts(cc.request, cc.responseBody),
    exampleApplicationMiddleware,
    exampleErrorHandlingMiddleware
 );
@@ -62,15 +66,15 @@ Installation
 ------------
 
 ```console
-npm install rho-contracts express-rho-contracts
+npm install rho-contracts express-contracts
 ```
 
 
 Contribute
 ----------
 
-- Issue Tracker: github.com/bodylabs/express-rho-contracts/issues
-- Source Code: github.com/bodylabs/express-rho-contracts
+- Issue Tracker: github.com/bodylabs/express-contracts/issues
+- Source Code: github.com/bodylabs/express-contracts
 
 Pull requests welcome!
 
