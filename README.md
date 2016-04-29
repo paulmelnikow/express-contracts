@@ -3,7 +3,7 @@ Express.js plugin for checking request and response with rho-contracts
 
 Example usage (adapted from `middleware.spec.js`):
 
-```
+```js
 var c = require('rho-contracts'),
     erc = require('express-rho-contracts');
 
@@ -53,6 +53,35 @@ Furthermore, note that the middleware works by extending `res` with a method
 thus it is easy to "jump out" of the contract e.g. to send an error.
 
 Finally, there is an asymmetry between the `requestContract`, which is run over
-the whole request, and the `responseBodyContract`, which is only run over the
-payload which eventually becomes the `res.body`. The motivation for checking
-the whole request is to have the ability to check query strings.
+the whole request (but only `body` and `query` actually checked), and the
+`responseBodyContract`, which is only run over the payload that eventually
+becomes the `res.body`.
+
+
+Installation
+------------
+
+```console
+npm install rho-contracts express-rho-contracts
+```
+
+
+Contribute
+----------
+
+- Issue Tracker: github.com/bodylabs/express-rho-contracts/issues
+- Source Code: github.com/bodylabs/express-rho-contracts
+
+Pull requests welcome!
+
+
+Support
+-------
+
+If you are having issues, please let us know.
+
+
+License
+-------
+
+The project is licensed under the two-clause BSD license.
