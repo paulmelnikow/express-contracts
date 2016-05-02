@@ -1,4 +1,7 @@
-var errors = require('./errors');
+var c = require('rho-contracts');
+
+var contracts = require('./contracts'),
+    errors = require('./errors');
 
 // Given a `requestContract` and a `responseBodyContract`, construct a
 // middleware that acts as a functional contract for the express endpoint.
@@ -17,6 +20,10 @@ var useContracts = function (requestContract, responseBodyContract) {
         validateRequest(req, requestContract, next);
         next();
     };
+};
+
+var useContractsOrError = function (requestContract, responseBodyContract) {
+    return useContracts(requestContract, c.or(responseBodyContract, contracts.errorBody));
 };
 
 var extendWithCheckedJson = function (res, responseBodyContract, next) {
@@ -49,4 +56,23 @@ var validateRequest = function (req, requestContract, next) {
     }
 };
 
-module.exports.useContracts = useContracts;
+var createCheckedErrorHandler = function (context) {
+    return function (err, req, res, next) {
+        if (! err) {
+            return next();
+        }
+        if (err instanceof errors.ValidationError) {
+            res.status(400).checkedJson({ error: err.message });
+        } else {
+            context.logger.error(err);
+            res.status(500).checkedJson({ error: 'Internal Server Error' });
+        }
+    };
+};
+
+
+module.exports = {
+    useContracts: useContracts,
+    useContractsOrError: useContractsOrError,
+    createCheckedErrorHandler: createCheckedErrorHandler,
+};
