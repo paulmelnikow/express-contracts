@@ -1,3 +1,5 @@
+var c = require('rho-contracts');
+
 var contracts = require('./contracts'),
     errors = require('./errors');
 
