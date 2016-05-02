@@ -3,4 +3,4 @@ var contracts = require('./src/contracts'),
     errors = require('./src/errors'),
     _ = require('underscore');
 
-module.exports = _({}).extend(errors, middleware);
+module.exports = _({}).extend(contracts, errors, middleware);
