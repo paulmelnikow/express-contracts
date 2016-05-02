@@ -23,7 +23,7 @@
     "underscore": "~1.8.3"
   },
   "peerDependencies": {
-    "rho-contracts": ">=1.0.0"
+    "rho-contracts": ">=1.2.0"
   },
   "devDependencies": {
     "body-parser": "~1.9.3",
@@ -32,7 +32,7 @@
     "express": "~4.10.3",
     "jscs": "^2.8.0",
     "mocha": "^2.3.4",
-    "rho-contracts": "git+https://github.com/bodylabs/rho-contracts.js.git#1.0.0",
+    "rho-contracts": "git+https://github.com/bodylabs/rho-contracts.js.git#1.2.0",
     "should": "^8.1.1",
     "supertest": "~0.15.0"
   }
