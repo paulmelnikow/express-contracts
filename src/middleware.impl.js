@@ -56,7 +56,32 @@ var validateRequest = function (req, requestContract, next) {
     }
 };
 
+var simpleErrorHandling = function (err, req, res, next) {
+    if (! err) {
+        return next();
+    }
+    res.status(err.status || 500);
+    res.json({ error: err.message });
+};
+
+var createCheckedErrorHandler = function (context) {
+    return function (err, req, res, next) {
+        if (! err) {
+            return next();
+        }
+        if (err instanceof errors.ValidationError) {
+            res.status(400).checkedJson({ error: err.message });
+        } else {
+            context.logger.error(err);
+            res.status(500).checkedJson({ error: 'Internal Server Error' });
+        }
+    };
+};
+
+
 module.exports = {
     useContracts: useContracts,
     useContractsOrError: useContractsOrError,
+    simpleErrorHandling: simpleErrorHandling,
+    createCheckedErrorHandler: createCheckedErrorHandler,
 };
