@@ -1,4 +1,5 @@
-var c = require('rho-contracts');
+var c = require('rho-contracts'),
+    _ = require('underscore');
 
 var cc = {};
 
@@ -13,4 +14,10 @@ var middlewareContracts = {
         .returns(cc.middleware),
 };
 
-module.exports = middlewareContracts.wrap(require('./middleware.impl'));
+var wrapAll = function (contracts, impl) {
+    return _(contracts).mapObject(function (contract, key) {
+        return contract.wrap(impl[key]);
+    });
+};
+
+module.exports = wrapAll(middlewareContracts, require('./middleware.impl'));
