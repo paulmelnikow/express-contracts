@@ -9,7 +9,7 @@ cc.useContracts = c.fun({ requestContract: c.contract }, { responseBodyContract:
     .returns(cc.middleware);
 
 // Reduce boilerplate for controllers of having to union with contracts.errorBody
-cc.useContractsOrError = c.fun({ requestContract: c.contract }, { responseBodyContract : c.contract })
+cc.useContractsOrError = c.fun({ requestContract: c.contract }, { responseBodyContract: c.contract })
     .returns(cc.middleware);
 
 module.exports = {
