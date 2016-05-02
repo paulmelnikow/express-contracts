@@ -1,4 +1,5 @@
-var middleware = require('./src/middleware'),
+var contracts = require('./src/contracts'),
+    middleware = require('./src/middleware'),
     errors = require('./src/errors'),
     _ = require('underscore');
 

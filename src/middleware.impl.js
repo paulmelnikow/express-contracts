@@ -1,4 +1,5 @@
-var errors = require('./errors');
+var contracts = require('./contracts'),
+    errors = require('./errors');
 
 // Given a `requestContract` and a `responseBodyContract`, construct a
 // middleware that acts as a functional contract for the express endpoint.
@@ -17,6 +18,10 @@ var useContracts = function (requestContract, responseBodyContract) {
         validateRequest(req, requestContract, next);
         next();
     };
+};
+
+var useContractsOrError = function (requestContract, responseBodyContract) {
+    return useContracts(requestContract, c.or(responseBodyContract, contracts.errorBody));
 };
 
 var extendWithCheckedJson = function (res, responseBodyContract, next) {
@@ -49,4 +54,7 @@ var validateRequest = function (req, requestContract, next) {
     }
 };
 
-module.exports.useContracts = useContracts;
+module.exports = {
+    useContracts: useContracts,
+    useContractsOrError: useContractsOrError,
+};
