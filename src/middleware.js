@@ -18,8 +18,6 @@ var middlewareContracts = {
     useContractsOrError: c.fun({ requestContract: c.contract }, { responseBodyContract: c.contract })
         .returns(cc.middleware),
 
-    simpleErrorHandling: cc.middleware,
-
     // Construct an error-handling middleware that works with `useContracts`
     // and the `errorBody` custom contract.
     createCheckedErrorHandler: c.fun({ context: cc.errorHandlerContext })

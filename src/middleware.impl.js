@@ -56,14 +56,6 @@ var validateRequest = function (req, requestContract, next) {
     }
 };
 
-var simpleErrorHandling = function (err, req, res, next) {
-    if (! err) {
-        return next();
-    }
-    res.status(err.status || 500);
-    res.json({ error: err.message });
-};
-
 var createCheckedErrorHandler = function (context) {
     return function (err, req, res, next) {
         if (! err) {
@@ -82,6 +74,5 @@ var createCheckedErrorHandler = function (context) {
 module.exports = {
     useContracts: useContracts,
     useContractsOrError: useContractsOrError,
-    simpleErrorHandling: simpleErrorHandling,
     createCheckedErrorHandler: createCheckedErrorHandler,
 };
