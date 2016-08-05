@@ -38,9 +38,13 @@ var extendWithCheckedJson = function (res, responseBodyContract, next) {
 };
 
 var validateRequest = function (req, requestContract, next) {
-    // Check each field (body, query, etc) individually so that we don't
+    // Check each field (body, query, params) individually so that we don't
     // dump the *entire* express req object into the error message.
-    var relevantKeyDescriptions = { body: 'request body', query: 'query string' };
+    var relevantKeyDescriptions = {
+        body: 'request body',
+        query: 'query string',
+        params: 'request params',
+    };
     var key;
     try {
         for (key in relevantKeyDescriptions) {

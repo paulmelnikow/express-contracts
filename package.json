@@ -1,6 +1,6 @@
 {
   "name": "express-contracts",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Express.js plugin for checking request and response with rho-contracts",
   "license": "BSD-2-Clause",
   "main": "index.js",
