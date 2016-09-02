@@ -56,7 +56,7 @@ var validateRequest = function (req, requestContract, next) {
         }
     } catch (e) {
         var prefix = 'Validation error in ' + relevantKeyDescriptions[key] + ':\n';
-        return next(new errors.ValidationError(prefix + e.message));
+        return next(new errors.ValidationError(prefix + e.message, key));
     }
 };
 

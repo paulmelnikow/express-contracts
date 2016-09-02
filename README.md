@@ -64,9 +64,23 @@ Furthermore, note that the middleware works by extending `res` with a method
 thus it is easy to "jump out" of the contract e.g. to send an error.
 
 Finally, there is an asymmetry between the `requestContract`, which is run over
-the whole request (but only `body` and `query` actually checked), and the
-`responseBodyContract`, which is only run over the payload that eventually
-becomes the `res.body`.
+the whole request (but only `body`, `query`, and `params` are actually
+checked), and the `responseBodyContract`, which is only run over the payload
+that eventually becomes the `res.body`.
+
+As of 2.2.0, the exported `ValidationError` says which of the three checked
+fields caused the (first seen) error, under the key `problemField`, e.g.
+```js
+if (err.problemField === 'body') {
+    // do something
+} else if (err.problemField === 'query') {
+    // do something else
+} else if (err.problemField === 'params') {
+    // do yet something else
+} else {
+    // should not happen unless we start checking more fields
+}
+```
 
 
 Installation

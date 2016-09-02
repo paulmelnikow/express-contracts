@@ -1,6 +1,7 @@
-var ValidationError = function (message) {
+var ValidationError = function (message, problemField) {
     this.name = 'ValidationError';
     this.message = message;
+    this.problemField = problemField;
     this.stack = (new Error()).stack;
 };
 

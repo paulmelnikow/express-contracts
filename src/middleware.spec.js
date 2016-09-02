@@ -21,9 +21,10 @@ describe('Tests for middleware', function () {
         baz: c.value('barbar'),
     }).strict().rename('responseBody');
 
-    cc.errorBody = c.object({
+    cc.errorWithProblemFieldBody = c.object({
         error: c.string,
-    }).strict().rename('errorBody');
+        problemField: c.optional(c.string),
+    }).strict().rename('errorWithProblemFieldBody');
 
     // Each test should set appLogic (lexical variable) to customize
     // appLogicLazy middleware.
@@ -36,7 +37,7 @@ describe('Tests for middleware', function () {
     var exampleHandleError = function (err, req, res, next) {
         if (err) {
             if (err instanceof errors.ValidationError) {
-                res.status(400).checkedJson({ error: err.message });
+                res.status(400).checkedJson({ error: err.message, problemField: err.problemField });
             } else if (err instanceof c.ContractError) {
                 res.status(500).checkedJson({ error: 'Internal Contract Violation' });
             } else {
@@ -47,7 +48,7 @@ describe('Tests for middleware', function () {
 
     app.use(
         require('body-parser').json(), // populates req.body
-        middleware.useContracts(cc.request, c.or(cc.responseBody, cc.errorBody)),
+        middleware.useContracts(cc.request, c.or(cc.responseBody, cc.errorWithProblemFieldBody)),
         appLogicLazy,
         exampleHandleError
     );
@@ -79,7 +80,8 @@ describe('Tests for middleware', function () {
         .expect(400)
         .end(function (err, res) {
             should(err).equal(null);
-            cc.errorBody.check(res.body); // sanity check
+            cc.errorWithProblemFieldBody.check(res.body); // sanity check
+            res.body.problemField.should.equal('body');
             // Should not dump entire `req` into error message
             res.body.error.should.equal('Validation error in request body:\nField `foo` required, got {}\n');
 
@@ -98,7 +100,8 @@ describe('Tests for middleware', function () {
         .expect(500)
         .end(function (err, res) {
             should(err).equal(null);
-            cc.errorBody.check(res.body); // sanity check
+            cc.errorWithProblemFieldBody.check(res.body); // sanity check
+            should.not.exist(res.body.problemField); // not for the 500's
             res.body.error.should.equal('Internal Contract Violation');
             done();
         });
