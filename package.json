@@ -1,6 +1,6 @@
 {
   "name": "express-contracts",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Express.js plugin for checking request and response with rho-contracts",
   "license": "BSD-2-Clause",
   "main": "index.js",
@@ -12,10 +12,6 @@
   "repository": {
     "type": "git",
     "url": "git@github.com:bodylabs/express-contracts.git"
-  },
-  "engines": {
-    "node": "5.8.0",
-    "npm": "3.5.x"
   },
   "dependencies": {
     "underscore": "~1.8.3"
